@@ -1,0 +1,18 @@
+{% extends "layout.njk" %}
+
+{% block content %}
+
+    <h1 class="govuk-heading-xl">Books</h1>
+
+    <ul class="govuk-list govuk-list--bullet">
+        {% for book in books %}
+        <li>
+            <h2 class="govuk-heading-m">{{ book.title }}</h2>
+            <p class="govuk-body">by {{ book.author }}</p>
+            <p class="govuk-body">{{ book.synopsis }}</p>
+        </li>
+        {% endfor %}
+    </ul>
+
+{% endblock %}
+
