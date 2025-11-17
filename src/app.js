@@ -2,7 +2,7 @@ import express from 'express';
 import nunjucks from 'nunjucks';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { getBooks } from './apiClient.js';
+import { getBookById, getBooks } from './apiClient.js';
 
 const _filename = fileURLToPath(import.meta.url);
 const _dirname = path.dirname(_filename);
@@ -34,6 +34,16 @@ app.get('/books', async (req, res) => {
     res.render('books.njk', {
         pageTitle: 'Books',
         books: booksData.items,
+    });
+});
+
+app.get('/books/:bookId', async (req, res) => {
+    const bookId = req.params.bookId;
+    const bookData = await getBookById(bookId);
+
+    res.render('book-data.njk', {
+        pageTitle: bookData.title,
+        bookData,
     });
 });
 

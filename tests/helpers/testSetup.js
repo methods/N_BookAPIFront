@@ -9,6 +9,7 @@ export const setupMockedApp = async () => {
 
     jest.unstable_mockModule('../../src/apiClient.js', () => ({
     getBooks: jest.fn(),
+    getBookById: jest.fn(),
     }));
 
     const apiClient = await import('../../src/apiClient.js');
