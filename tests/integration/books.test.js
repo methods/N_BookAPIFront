@@ -8,14 +8,18 @@ const mockApiResponse = {
         title: 'The Midnight Library',
         author: 'Matt Haig',
         synopsis: 'A novel about all the choices that go into a life well lived.',
-        links: { self: '/books/123-abc' },
+        links: {
+            self: 'http://localhost:5003/books/123-abc',
+            reservations: 'http://localhost:5003/books/123-abc/reservations' },
         },
         {
         id: '456-def',
         title: 'Project Hail Mary',
         author: 'Andy Weir',
         synopsis: 'A lone astronaut must save the Earth from disaster.',
-        links: { self: '/books/456-def' },
+        links: { 
+            self: 'http://localhost:5003/books/456-def',
+            reservations: 'http://localhost:5003/books/456-def/reservations' },
         },
     ],
 };
@@ -53,6 +57,12 @@ describe('GET /books', () => {
         expect(response.text).toMatch(/Matt Haig/);
         expect(response.text).toMatch(/Project Hail Mary/);
         expect(response.text).toMatch(/Andy Weir/);
+        // AND the book HATEOAS links should be present
+        expect(response.text).toMatch(/<a.*href="\/books\/123-abc".*>The Midnight Library<\/a>/);
+        expect(response.text).toMatch(/<a.*href="\/books\/123-abc\/reservations".*>Reservations<\/a>/);
+        expect(response.text).toMatch(/<a.*href="\/books\/456-def".*>Project Hail Mary<\/a>/);
+        expect(response.text).toMatch(/<a.*href="\/books\/456-def\/reservations".*>Reservations<\/a>/);
+        expect(response.text).not.toMatch(/href="http:\/\/localhost:5003/);
   });
 });
 
@@ -79,7 +89,10 @@ describe('GET /books/:bookId', () => {
                 title: 'The Lord of the Rings',
                 author: 'J.R.R. Tolkien',
                 synopsis: 'An epic adventure in Middle-earth.',
-            };
+                links: { 
+                    self: `http://localhost:5003/books/${bookId}`,
+                    reservations: `http://localhost:5003/books/${bookId}/reservations` },
+                };
 
             // AND a mock apiClient that will return it
             apiClient.getBookById.mockResolvedValue(mockBook);
@@ -93,6 +106,10 @@ describe('GET /books/:bookId', () => {
             expect(response.text).toMatch(/<h1.*>The Lord of the Rings<\/h1>/);
             expect(response.text).toMatch(/J\.R\.R\. Tolkien/);
             expect(response.text).toMatch(/An epic adventure in Middle-earth\./);
+            // AND the reservations link should be present and correctly formatted
+            const expectedLinkPattern = `<a.*href="/books/${bookId}/reservations".*>Reservations</a>`;
+            const regex = new RegExp(expectedLinkPattern);
+            expect(response.text).toMatch(regex);
 
             // AND the mock object should have been called correctly
             expect(apiClient.getBookById).toHaveBeenCalledTimes(1);

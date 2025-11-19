@@ -7,9 +7,12 @@
     <ul class="govuk-list govuk-list--bullet">
         {% for book in books %}
         <li>
-            <h2 class="govuk-heading-m">{{ book.title }}</h2>
+            <h2 class="govuk-heading-m">
+                <a class="govuk-link" href="{{ book.links.self }}">{{ book.title }}</a>
+            </h2>
             <p class="govuk-body">by {{ book.author }}</p>
             <p class="govuk-body">{{ book.synopsis }}</p>
+            <a class="govuk-link" href="{{ book.links.reservations }}">Reservations</a>
         </li>
         {% endfor %}
     </ul>

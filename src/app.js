@@ -19,6 +19,20 @@ nunjucks.configure(
     }
 );
 
+function transformBookLinks(book) {
+    const relativeLinks = {};
+    if (book.links) {
+        for (const key in book.links) {
+            const absoluteUrl = book.links[key];
+            relativeLinks[key] = new URL(absoluteUrl).pathname;
+        }
+    }
+    return {
+        ...book,
+        links: relativeLinks
+    };
+};
+
 app.set('view engine', 'njk');
 
 const govukPath = path.join(_dirname, '../node_modules/govuk-frontend/dist')
@@ -31,19 +45,22 @@ app.get('/', (req, res) => {
 app.get('/books', async (req, res) => {
     const booksData = await getBooks();
 
+    const booksForView = booksData.items.map(transformBookLinks);
+
     res.render('books.njk', {
         pageTitle: 'Books',
-        books: booksData.items,
+        books: booksForView,
     });
 });
 
 app.get('/books/:bookId', async (req, res) => {
     const bookId = req.params.bookId;
     const bookData = await getBookById(bookId);
+    const bookForView = transformBookLinks(bookData);
 
     res.render('book-data.njk', {
-        pageTitle: bookData.title,
-        bookData,
+        pageTitle: bookForView.title,
+        bookForView,
     });
 });
 
