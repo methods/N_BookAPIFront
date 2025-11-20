@@ -1,0 +1,18 @@
+{% extends "layout.njk" %}
+
+{% block content %}
+
+    <h1 class="govuk-heading-xl">{{ bookForView.title }}</h1>
+
+    <p class="govuk-body-l">by {{ bookForView.author }}</p>
+    
+    <div class="govuk-inset-text">
+        <p class="govuk-body">{{ bookForView.synopsis }}</p>
+
+        <a class="govuk-link" href="{{ bookForView.links.reservations }}">Reservations</a>
+    </div>
+
+    {# Add a link to go back to the list #}
+    <a href="/books" class="govuk-back-link">Back to all books</a>
+
+{% endblock %}

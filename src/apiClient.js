@@ -9,3 +9,8 @@ export const getBooks = async () => {
     const response = await apiClient.get('/books');
     return response.data;
 }
+
+export const getBookById = async (bookId) => {
+    const response = await apiClient.get(`/books/${bookId}`);
+    return response.data;
+}
