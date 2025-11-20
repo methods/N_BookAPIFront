@@ -116,4 +116,32 @@ describe('GET /books/:bookId', () => {
             expect(apiClient.getBookById).toHaveBeenCalledWith(bookId);
             });
     });
+
+    describe('When the book does not exist', () => {
+        it('should respond with 404 Not Found and display an error page', async () => {
+            // GIVEN a format-valid bookId for a book that does not exist
+            const nonExistentBookId = '123e4567-e89b-12d3-a456-426614174000';
+
+            // AND a mock API error
+            const apiError = {
+                response: {
+                    status: 404
+                }
+            };
+
+            // AND a mock apiClient that will return this error
+            apiClient.getBookById.mockRejectedValue(apiError);
+
+            // WHEN a request is made to the non-existent book's endpoint
+            const response = await request(app).get(`/books/${nonExistentBookId}`);
+
+            // THEN the response should be 404 Not Found and contain a user-friendly message
+            expect(response.statusCode).toBe(404);
+            expect(response.text).toMatch(/<h1.*>Page not found<\/h1>/);
+            expect(response.text).toMatch(/If you typed the web address, check it is correct./);
+    
+            // AND the mock should have been called correctly
+            expect(apiClient.getBookById).toHaveBeenCalledWith(nonExistentBookId);
+        });
+    });
 });

@@ -55,13 +55,23 @@ app.get('/books', async (req, res) => {
 
 app.get('/books/:bookId', async (req, res) => {
     const bookId = req.params.bookId;
-    const bookData = await getBookById(bookId);
-    const bookForView = transformBookLinks(bookData);
 
-    res.render('book-data.njk', {
-        pageTitle: bookForView.title,
-        bookForView,
+    try {
+        const bookData = await getBookById(bookId);
+        const bookForView = transformBookLinks(bookData);
+
+        res.render('book-data.njk', {
+            pageTitle: bookForView.title,
+            bookForView,
     });
+    } catch (error) {
+        if (error.response && error.response.status === 404) {
+            res.status(404).render('404.njk', { pageTitle: 'Page not found' });
+        } else {
+            res.status(500).render('500.njk', { pageTitle: 'Sorry, there is a problem with the service' });
+        }
+    }
+
 });
 
 export default app;
