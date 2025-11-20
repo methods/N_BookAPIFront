@@ -144,4 +144,31 @@ describe('GET /books/:bookId', () => {
             expect(apiClient.getBookById).toHaveBeenCalledWith(nonExistentBookId);
         });
     });
+
+    describe('when the backend API returns a server error', () => {
+        it('should respond with 500 and display a generic error page', async () => {
+            // GIVEN: a valid bookId
+            const bookId = '123e4567-e89b-12d3-a456-426614174000';
+
+            // AND: a mock API error that simulates a 500 Internal Server Error
+            const mockApiError = {
+            response: { 
+                status: 500,
+                data: { error: 'Something went wrong on the server' } 
+            } 
+            };
+            // AND a mock client configured to return the Error
+            apiClient.getBookById.mockRejectedValue(mockApiError);
+
+            // WHEN a request is made to the endpoint
+            const response = await request(app).get(`/books/${bookId}`);
+
+            // THEN the response should be 500 and contain our user-friendly 500 message
+            expect(response.statusCode).toBe(500);
+            expect(response.text).toMatch(/<h1.*>Sorry, there is a problem with the service<\/h1>/);
+            expect(response.text).toMatch(/Try again later\./);
+            
+            expect(apiClient.getBookById).toHaveBeenCalledWith(bookId);
+  });
+});
 });
